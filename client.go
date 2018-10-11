@@ -25,7 +25,6 @@ import (
 	"time"
 
 	"github.com/certifi/gocertifi"
-	pkgErrors "github.com/pkg/errors"
 )
 
 const (
@@ -707,9 +706,8 @@ func (client *Client) CaptureError(err error, tags map[string]string, interfaces
 	}
 
 	extra := extractExtra(err)
-	cause := pkgErrors.Cause(err)
 
-	packet := NewPacketWithExtra(err.Error(), extra, append(append(interfaces, client.context.interfaces()...), NewException(cause, GetOrNewStacktrace(cause, 1, 3, client.includePaths)))...)
+	packet := NewPacketWithExtra(err.Error(), extra, append(append(interfaces, client.context.interfaces()...), NewException(err, GetOrNewStacktrace(err, 1, 3, client.includePaths)))...)
 	eventID, _ := client.Capture(packet, tags)
 
 	return eventID
@@ -732,9 +730,8 @@ func (client *Client) CaptureErrorAndWait(err error, tags map[string]string, int
 	}
 
 	extra := extractExtra(err)
-	cause := pkgErrors.Cause(err)
 
-	packet := NewPacketWithExtra(err.Error(), extra, append(append(interfaces, client.context.interfaces()...), NewException(cause, GetOrNewStacktrace(cause, 1, 3, client.includePaths)))...)
+	packet := NewPacketWithExtra(err.Error(), extra, append(append(interfaces, client.context.interfaces()...), NewException(err, GetOrNewStacktrace(err, 1, 3, client.includePaths)))...)
 	eventID, ch := client.Capture(packet, tags)
 	if eventID != "" {
 		<-ch
